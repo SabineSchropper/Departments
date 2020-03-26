@@ -15,17 +15,22 @@ public class Departments {
 
     //Constructor
 
-    public Departments(String departmentName, String nameMitarbeiter) {
+    public Departments(String departmentName) {
         this.departmentName = departmentName;
-        this.nameOfLeader = nameMitarbeiter;
 
     }
 
     public void addSubDepartment(Departments subDepartment) {
+        for(Departments departments : departmentsArray) {
+            if(departments != null) {
+                if(subDepartment.departmentName.equalsIgnoreCase(departments.departmentName)){
 
-        this.subDepartment = subDepartment;
-        departmentsArray[departmentcounter] = subDepartment;
-        departmentcounter++;
+                }
+                this.subDepartment = subDepartment;
+                departmentsArray[departmentcounter] = subDepartment;
+                departmentcounter++;
+            }
+        }
 
     }
 
@@ -34,7 +39,8 @@ public class Departments {
         myTabs = myTabs + "\t";
         for (int i = 0; i < departmentsArray.length; i++) {
             if(departmentsArray[i] != null) {
-                myPartlyOutput = myPartlyOutput + "\n" + myTabs + departmentsArray[i].departmentName + " (" + departmentsArray[i].nameOfLeader +")";
+                myPartlyOutput = myPartlyOutput + "\n" + myTabs + departmentsArray[i].departmentName;
+                myPartlyOutput = myPartlyOutput + " (" + departmentsArray[i].employeeArray[0].name +")";
                 myPartlyOutput = departmentsArray[i].printDepartment(myPartlyOutput, myTabs);
             }
         }

@@ -2,12 +2,10 @@ package com.company;
 
 public class Employees {
 
-    String firstName;
-    String lastName;
-    int age;
+    String name;
+    String department;
 
-    public Employees (String firstName, String lastName){
-        this. firstName = firstName;
-        this. lastName = lastName;
+    public Employees (String name){
+        this.name = name;
     }
 }

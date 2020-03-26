@@ -1,27 +1,51 @@
 package com.company;
 
+import java.io.*;
+import java.util.ArrayList;
+
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        Employees[] employeesArray = new Employees[30];
+        //ArrayList<Employees> employeeList = new ArrayList<>();
+        Departments[] departmentsArray = new Departments[15];
+        int employeeCounter = 0;
+        int departmentCounter = 0;
+        String parentDepartment = "";
+        String myOutput = "";
 
-        String output = "";
+        File myFile = new File("C:\\Users\\DCV\\Documents\\Abteilungen1.txt");
+        FileReader fileReader = new FileReader(myFile);
+        BufferedReader bufferedReader = new BufferedReader(fileReader);
+        String line = null;
 
-        Employees person1 = new Employees("Thomas","Mustermann");
-        Employees person2 = new Employees("Nina", "Anders");
-        Employees person3 = new Employees("Tina","Marte");
-        Employees person4 = new Employees("Max","Wilhelmer");
+        while ((line = bufferedReader.readLine()) != null) {
+            String[] splittedValues = line.split(";");
+            String name = splittedValues[0];
+            String department = splittedValues[1];
+            if (splittedValues.length > 2) {
+                parentDepartment = splittedValues[2];
+            }
+            employeesArray[employeeCounter] = new Employees(name);
+            departmentsArray[departmentCounter] = new Departments(department);
+            //next Step is to add the employee to the department
+            departmentsArray[departmentCounter].addEmployee(employeesArray[employeeCounter]);
+            // run through departmentsArray and add subdepartment "department"
+            if (splittedValues.length > 2) {
+                for (Departments departments : departmentsArray) {
+                    if (departments != null) {
+                        if (departments.departmentName.equalsIgnoreCase(parentDepartment)) {
+                            departments.addSubDepartment(departmentsArray[departmentCounter]);
+                        }
+                    }
+                }
+            }
+            employeeCounter++;
+            departmentCounter++;
+        }
 
-        Departments vorstand = new Departments("Vorstand", "Alfred Boss");
-        Departments vertriebLeiter = new Departments("Vertrieb Leiter","Mustermann Max");
-        Departments vertriebPrivatkunden = new Departments("Vertrieb Privatkunden","Musterfrau Angela");
-        Departments vertriebFirmenkunden = new Departments("Vertrieb Firmenkunden","Muste Alfons");
-        Departments einkaufLeiter = new Departments("Einkauf Leiter","Kufmann Alois");
-        Departments einkaufMechanik = new Departments("Einkauf Mechanik","Gunz Herlinde");
-        Departments einkaufKleinteile = new Departments("Einkauf Kleinteile","But Moritz");
-        Departments einkaufGrossteile = new Departments("Einkauf Grossteile","Friedrich Hermann");
-        Departments einkaufEuropa = new Departments("Einkauf Europa","Peter Hannelore");
 
-        vorstand.addSubDepartment(vertriebLeiter);
+      /*  vorstand.addSubDepartment(vertriebLeiter);
         //vorstand.addSubDepartment(vertriebPrivatkunden);
 
         vertriebLeiter.addSubDepartment(vertriebPrivatkunden);
@@ -54,6 +78,13 @@ public class Main {
         einkaufEuropa.switchDepartment(person4, einkaufGrossteile);
 
         System.out.println("Im Einkauf für Großteile arbeiten "+einkaufGrossteile.getEmployeeCounter()+ " Personen.");
+
+       */
+        String myFirstLine = "\t" + departmentsArray[1].departmentName + " " + departmentsArray[1].employeeArray[0].name;
+        myOutput = "";
+        String myTabs = "\t";
+        myOutput = myFirstLine + departmentsArray[1].printDepartment(myOutput, myTabs);
+        System.out.println(myOutput);
 
 
     }

@@ -6,13 +6,12 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        Employees[] employeesArray = new Employees[30];
-        //ArrayList<Employees> employeeList = new ArrayList<>();
-        Departments[] departmentsArray = new Departments[15];
-        int employeeCounter = 0;
-        int departmentCounter = 0;
+        ArrayList<Employee> employeeList = new ArrayList<>();
+        ArrayList<Department> departmentList = new ArrayList<>();
         String parentDepartment = "";
-        String myOutput = "";
+        boolean doesDepartmentAlreadyExists;
+        Department searchedDepartment;
+        Department destinationDepartment;
 
         File myFile = new File("C:\\Users\\DCV\\Documents\\Abteilungen1.txt");
         FileReader fileReader = new FileReader(myFile);
@@ -20,72 +19,83 @@ public class Main {
         String line = null;
 
         while ((line = bufferedReader.readLine()) != null) {
+            doesDepartmentAlreadyExists = false;
             String[] splittedValues = line.split(";");
             String name = splittedValues[0];
-            String department = splittedValues[1];
+            String departmentName = splittedValues[1];
             if (splittedValues.length > 2) {
                 parentDepartment = splittedValues[2];
             }
-            employeesArray[employeeCounter] = new Employees(name);
-            departmentsArray[departmentCounter] = new Departments(department);
-            //next Step is to add the employee to the department
-            departmentsArray[departmentCounter].addEmployee(employeesArray[employeeCounter]);
-            // run through departmentsArray and add subdepartment "department"
+            Employee employee = new Employee(name);
+            employeeList.add(employee);
+            Department department = new Department(departmentName, employee);
+            employee.setDepartment(department);
+            //if departmentName already exists we only add the employee, else we add the department to the list
+            for (Department dep : departmentList) {
+                if (dep.departmentName.equalsIgnoreCase(department.departmentName)) {
+                    doesDepartmentAlreadyExists = true;
+                }
+            }
+            if (doesDepartmentAlreadyExists) {
+                department.addEmployee(employee);
+            } else {
+                departmentList.add(department);
+            }
+
+            // run through departmentsArrayList and add subdepartment "department"
             if (splittedValues.length > 2) {
-                for (Departments departments : departmentsArray) {
-                    if (departments != null) {
-                        if (departments.departmentName.equalsIgnoreCase(parentDepartment)) {
-                            departments.addSubDepartment(departmentsArray[departmentCounter]);
-                        }
+                for (Department dep : departmentList) {
+                    if (dep.departmentName.equalsIgnoreCase(parentDepartment)) {
+                        dep.addSubDepartment(department);
                     }
                 }
             }
-            employeeCounter++;
-            departmentCounter++;
         }
 
+        printDepartments(departmentList);
 
-      /*  vorstand.addSubDepartment(vertriebLeiter);
-        //vorstand.addSubDepartment(vertriebPrivatkunden);
+        searchedDepartment = searchDepartmentOfEmployee("Frida Haudrauf", employeeList);
+        destinationDepartment = findDepartmentInList("Vertrieb Europa", departmentList);
+        searchedDepartment.switchDepartment("Frida Haudrauf", destinationDepartment );
 
-        vertriebLeiter.addSubDepartment(vertriebPrivatkunden);
-        vertriebLeiter.addSubDepartment(vertriebFirmenkunden);
-
-        vorstand.addSubDepartment(einkaufLeiter);
-        einkaufLeiter.addSubDepartment(einkaufMechanik);
-
-        einkaufMechanik.addSubDepartment(einkaufKleinteile);
-        einkaufMechanik.addSubDepartment(einkaufGrossteile);
-
-        einkaufGrossteile.addSubDepartment(einkaufEuropa);
-
-        output = "\t" + vorstand.departmentName + " " + vorstand.nameOfLeader + vorstand.printDepartment(output, "\t");
-        System.out.println(output);
-
-        vertriebPrivatkunden.addEmployee(person1);
-        vertriebPrivatkunden.addEmployee(person2);
-
-        System.out.println("Im "+vertriebPrivatkunden.departmentName+ " arbeiten "+vertriebPrivatkunden.getEmployeeCounter()+ " Personen.");
-
-        vertriebPrivatkunden.switchDepartment(person1,einkaufGrossteile);
-
-        System.out.println("Im Vertrieb Privatkunden arbeiten "+vertriebPrivatkunden.getEmployeeCounter()+ " Personen.");
-        System.out.println("Im Einkauf für Großteile arbeiten "+einkaufGrossteile.getEmployeeCounter()+ " Personen.");
-
-        einkaufEuropa.addEmployee(person4);
-
-        einkaufEuropa.switchDepartment(person1, einkaufGrossteile);
-        einkaufEuropa.switchDepartment(person4, einkaufGrossteile);
-
-        System.out.println("Im Einkauf für Großteile arbeiten "+einkaufGrossteile.getEmployeeCounter()+ " Personen.");
-
-       */
-        String myFirstLine = "\t" + departmentsArray[1].departmentName + " " + departmentsArray[1].employeeArray[0].name;
-        myOutput = "";
-        String myTabs = "\t";
-        myOutput = myFirstLine + departmentsArray[1].printDepartment(myOutput, myTabs);
-        System.out.println(myOutput);
-
+        printDepartments(departmentList);
 
     }
+
+    private static void printDepartments(ArrayList<Department> departmentList) {
+        String myOutput;
+        String firstLineOutput;
+        myOutput = "";
+        String myTabs = "\t";
+        firstLineOutput = departmentList.get(0).departmentName + " " + departmentList.get(0).employeeArrayList.get(0).name + "\n";
+        myOutput = firstLineOutput + departmentList.get(0).printDepartment(myOutput, myTabs);
+        System.out.print(myOutput);
+    }
+
+
+    static Department findDepartmentInList(String departmentNameString, ArrayList<Department> departmentArrayList) {
+        Department destination = null;
+        int index = 0;
+        for (Department department : departmentArrayList){
+            if(department.departmentName.equalsIgnoreCase(departmentNameString)){
+                index = departmentArrayList.indexOf(department);
+            }
+        }
+        destination = departmentArrayList.get(index);
+
+        return destination;
+    }
+
+    static Department searchDepartmentOfEmployee(String name, ArrayList<Employee> employeeList) {
+        Department department = null;
+        for (Employee employee : employeeList) {
+            if (employee.name.equalsIgnoreCase(name)) {
+                department = employee.getDepartment();
+                break;
+            }
+
+        }
+        return department;
+    }
+
 }

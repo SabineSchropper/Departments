@@ -6,9 +6,9 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        ArrayList<Employee> employeeList = new ArrayList<>();
-        ArrayList<Department> departmentList = new ArrayList<>();
-        String parentDepartment = "";
+        ArrayList<Employee> employees = new ArrayList<>();
+        ArrayList<Department> departments = new ArrayList<>();
+        Department department = null;
         boolean doesDepartmentAlreadyExists;
         Department searchedDepartment;
         Department destinationDepartment;
@@ -23,42 +23,51 @@ public class Main {
             String[] splittedValues = line.split(";");
             String name = splittedValues[0];
             String departmentName = splittedValues[1];
-            if (splittedValues.length > 2) {
-                parentDepartment = splittedValues[2];
-            }
+
             Employee employee = new Employee(name);
-            employeeList.add(employee);
-            Department department = new Department(departmentName, employee);
-            employee.setDepartment(department);
-            //if departmentName already exists we only add the employee, else we add the department to the list
-            for (Department dep : departmentList) {
-                if (dep.departmentName.equalsIgnoreCase(department.departmentName)) {
+            employees.add(employee);
+
+            for (Department dep : departments) {
+                if (dep.departmentName.equalsIgnoreCase(departmentName)) {
                     doesDepartmentAlreadyExists = true;
+                    department = dep;
                 }
             }
             if (doesDepartmentAlreadyExists) {
-                department.addEmployee(employee);
+                //if departmentName already exists we only add the employee
+                department.addEmployeeAndSetDepartment(employee);
             } else {
-                departmentList.add(department);
+                //else we create department, add employees and also add department to ArrayList
+                department = new Department(departmentName);
+                department.addEmployeeAndSetDepartment(employee);
+                departments.add(department);
             }
-
-            // run through departmentsArrayList and add subdepartment "department"
+        }
+        FileReader fileReader1 = new FileReader(myFile);
+        BufferedReader bufferedReader1 = new BufferedReader(fileReader1);
+        while ((line = bufferedReader1.readLine()) != null) {
+            String[] splittedValues = line.split(";");
+            String subDepartmentString = splittedValues[1];
+            String parentDepartment = "";
             if (splittedValues.length > 2) {
-                for (Department dep : departmentList) {
+                parentDepartment = splittedValues[2];
+                //now we add the SubDepartments
+                for (Department dep : departments) {
                     if (dep.departmentName.equalsIgnoreCase(parentDepartment)) {
-                        dep.addSubDepartment(department);
+                        Department subDepartment = searchDepartment(subDepartmentString, departments);
+                        dep.addSubDepartment(subDepartment);
                     }
                 }
             }
         }
 
-        printDepartments(departmentList);
+        printDepartments(departments);
 
-        searchedDepartment = searchDepartmentOfEmployee("Frida Haudrauf", employeeList);
-        destinationDepartment = findDepartmentInList("Vertrieb Europa", departmentList);
+        searchedDepartment = searchDepartmentOfEmployee("Frida Haudrauf", employees);
+        destinationDepartment = findDepartmentInList("Vertrieb Europa", departments);
         searchedDepartment.switchDepartment("Frida Haudrauf", destinationDepartment );
 
-        printDepartments(departmentList);
+        printDepartments(departments);
 
     }
 
@@ -67,9 +76,20 @@ public class Main {
         String firstLineOutput;
         myOutput = "";
         String myTabs = "\t";
-        firstLineOutput = departmentList.get(0).departmentName + " " + departmentList.get(0).employeeArrayList.get(0).name + "\n";
-        myOutput = firstLineOutput + departmentList.get(0).printDepartment(myOutput, myTabs);
+        Department department = searchDepartment("Vorstand", departmentList);
+        firstLineOutput = department.departmentName + " " + department.employees.get(0).name + "\n";
+        myOutput = firstLineOutput + department.printDepartment(myOutput, myTabs);
         System.out.print(myOutput);
+    }
+    static Department searchDepartment(String departmentName, ArrayList<Department> departments) {
+        Department searchedDepartment = null;
+        for (Department dep : departments) {
+            if (dep.departmentName.equalsIgnoreCase(departmentName)) {
+                searchedDepartment = dep;
+                break;
+            }
+        }
+        return searchedDepartment;
     }
 
 

@@ -5,29 +5,24 @@ import java.util.ArrayList;
 public class Department {
 
     String departmentName;
-    ArrayList<Department> departmentArrayList = new ArrayList<>();
-    ArrayList<Employee> employeeArrayList = new ArrayList<>();
+    ArrayList<Department> subDepartments = new ArrayList<>();
+    ArrayList<Employee> employees = new ArrayList<>();
     String myPartlyOutput;
 
-
-    public Department(String departmentName, Employee employee) {
+    public Department(String departmentName) {
         this.departmentName = departmentName;
-        employeeArrayList.add(employee);
-        employee.setDepartment(this);
     }
-
     public void addSubDepartment(Department subDepartment) {
-        if (!departmentArrayList.contains(subDepartment)) {
-            departmentArrayList.add(subDepartment);
+        if (!subDepartments.contains(subDepartment)) {
+            subDepartments.add(subDepartment);
         }
     }
-
     public String printDepartment(String myOutput, String myTabs) {
         String myTab = myTabs + "\t";
         myPartlyOutput = myOutput;
-        for (Department department : departmentArrayList) {
+        for (Department department : subDepartments) {
             myPartlyOutput = myPartlyOutput + myTab + department.departmentName;
-            for (Employee employee : department.employeeArrayList) {
+            for (Employee employee : department.employees) {
                 myPartlyOutput = myPartlyOutput + "  " + employee.name;
             }
             myPartlyOutput = myPartlyOutput + "\n ";
@@ -35,21 +30,18 @@ public class Department {
         }
         return myPartlyOutput;
     }
-
-
-    public void addEmployee(Employee employee){
-        if (!employeeArrayList.contains(employee)){
-            employeeArrayList.add(employee);
+    public void addEmployeeAndSetDepartment(Employee employee){
+        if (!employees.contains(employee)){
+            employees.add(employee);
             employee.setDepartment(this);
         }
     }
-
     public void switchDepartment(String personWantsToSwitch, Department switchDestination){
 
-        for(Employee employee : employeeArrayList){
+        for(Employee employee : employees){
             if (employee.name.equalsIgnoreCase(personWantsToSwitch)){
-                switchDestination.addEmployee(employee);
-                employeeArrayList.remove(employee);
+                switchDestination.addEmployeeAndSetDepartment(employee);
+                employees.remove(employee);
                 break;
             }
             else{
